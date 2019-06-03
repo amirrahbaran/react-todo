@@ -58,9 +58,9 @@ class App extends Component {
     );
   }
 
-  componentDidMount() {
-    this.props.TodoStore.retrieveTodos();
-  }
+  // componentDidMount() {
+  //   this.props.TodoStore.retrieveTodos();
+  // }
 }
 
 export default App;
