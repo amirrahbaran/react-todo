@@ -1,91 +1,42 @@
-import React from 'react';
-import { observable, action, computed, configure, runInAction } from 'mobx';
-// import axios from 'axios';
-// axios.defaults.baseURL = 'http://todo-laravel.test/api';
-configure({enforceActions: true});
+import React from "react";
+import { observable, action, computed, configure } from "mobx";
+configure({ enforceActions: true });
 
 class TodoStore {
   @observable todoInput = React.createRef();
-  @observable filter = 'all';
-  @observable beforeEditCache = '';
+  @observable filter = "all";
+  @observable beforeEditCache = "";
   @observable todos = [];
 
-  // @action retrieveTodos = () => {
-    // axios.get('/todos')
-    //   .then(response => {
-        // let tempTodos = response.data;
-        // tempTodos.forEach(todo => todo.editing = false);
-
-        // runInAction(() => {
-          // this.todos = tempTodos;
-      //   });
-      // })
-      // .catch(error => {
-      //   console.log(error);
-      // });
-  // }
-
   @action addTodo = event => {
-    if (event.key === 'Enter') {
+    if (event.key === "Enter") {
       const todoInput = this.todoInput.current.value;
-  
+
       if (todoInput.trim().length === 0) {
         return;
       }
 
-      // axios.post('/todos', {
-        // title: todoInput,
-        // completed: false,
-      // })
-        // .then(response => {
-          // runInAction(() => {
-            this.todos.push({
-              // id: response.data.id,
-              // title: response.data.title,
-              id: todoInput,
-              title: todoInput,
-              completed: false,
-              editing: false,
-            });
-        //   });
-        // })
-        // .catch(error => {
-        //   console.log(error);
-        // });
+      this.todos.push({
+        id: todoInput,
+        title: todoInput,
+        completed: false,
+        editing: false
+      });
 
-      this.todoInput.current.value = '';
+      this.todoInput.current.value = "";
     }
-  }
+  };
 
   @action deleteTodo = id => {
-    // axios.delete('/todos/' + id)
-      // .then(response => {
-      //   runInAction(() => {
-          const index = this.todos.findIndex(item => item.id === id);
-          this.todos.splice(index, 1);
-      //   });
-      // })
-      // .catch(error => {
-      //   console.log(error);
-      // });
-  }
+    const index = this.todos.findIndex(item => item.id === id);
+    this.todos.splice(index, 1);
+  };
 
   @action checkTodo = (todo, event) => {
-    // axios.patch('/todos/' + todo.id, {
-      // title: todo.title,
-      // completed: !todo.completed,
-    // })
-    //   .then(response => {
-    //     runInAction(() => {
-          todo.completed = !todo.completed;
-          const index = this.todos.findIndex(item => item.id === todo.id);
-          this.todos.splice(index, 1, todo);
-      //   });
-      // })
-      // .catch(error => {
-      //   console.log(error);
-      // });
-  }
+    todo.completed = !todo.completed;
+    const index = this.todos.findIndex(item => item.id === todo.id);
+    this.todos.splice(index, 1, todo);
+  };
 
   @action editTodo = (todo, event) => {
     todo.editing = true;
@@ -94,7 +45,7 @@ class TodoStore {
     const index = this.todos.findIndex(item => item.id === todo.id);
 
     this.todos.splice(index, 1, todo);
-  }
+  };
 
   @action doneEdit = (todo, event) => {
     todo.editing = false;
@@ -105,20 +56,9 @@ class TodoStore {
       todo.title = event.target.value;
     }
 
-    // axios.patch('/todos/' + todo.id, {
-      // title: todo.title,
-      // completed: todo.completed,
-    // })
-    //   .then(response => {
-    //     runInAction(() => {
-          const index = this.todos.findIndex(item => item.id === todo.id);
-          this.todos.splice(index, 1, todo);
-      //   });
-      // })
-      // .catch(error => {
-      //   console.log(error);
-      // });
-  }
+    const index = this.todos.findIndex(item => item.id === todo.id);
+    this.todos.splice(index, 1, todo);
+  };
 
   @action cancelEdit = (todo, event) => {
     todo.title = this.beforeEditCache;
@@ -127,61 +67,33 @@ class TodoStore {
     const index = this.todos.findIndex(item => item.id === todo.id);
 
     this.todos.splice(index, 1, todo);
-  }
+  };
 
-  @action checkAllTodos = (event) => {
-    this.todos.forEach(todo => todo.completed = event.target.checked);
+  @action checkAllTodos = event => {
+    this.todos.forEach(todo => (todo.completed = event.target.checked));
     event.persist();
 
-    // axios.patch('/todosCheckAll', {
-      // completed: event.target.checked,
-    // })
-    //   .then(response => {
-    //     runInAction(() => {
-          this.todos.forEach(todo => todo.completed = event.target.checked);
-      //   });
-      // })
-      // .catch(error => {
-      //   console.log(error);
-      // });
-  }
+    this.todos.forEach(todo => (todo.completed = event.target.checked));
+  };
 
   @action updateFilter = filter => {
     this.filter = filter;
-  }
-
+  };
 
   @action clearCompleted = () => {
-
-    // const completed = this.todos
-    //   .filter(todo => todo.completed)
-    //   .map(todo => todo.id);
-
-    // axios.delete('/todosDeleteCompleted', {
-    //   data: {
-    //     todos: completed
-    //   }
-    // })
-    //   .then(response => {
-    //     runInAction(() => {
-          this.todos = this.todos.filter(todo => !todo.completed);
-      //   });
-      // })
-      // .catch(error => {
-      //   console.log(error);
-      // });
-  }
+    this.todos = this.todos.filter(todo => !todo.completed);
+  };
 
   @computed get todosCompletedCount() {
     return this.todos.filter(todo => todo.completed).length;
   }
 
   @computed get todosFiltered() {
-    if (this.filter === 'all') {
+    if (this.filter === "all") {
       return this.todos;
-    } else if (this.filter === 'active') {
+    } else if (this.filter === "active") {
       return this.todos.filter(todo => !todo.completed);
-    } else if (this.filter === 'completed') {
+    } else if (this.filter === "completed") {
       return this.todos.filter(todo => todo.completed);
     }
 
